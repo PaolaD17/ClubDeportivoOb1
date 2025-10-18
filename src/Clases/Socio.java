@@ -1,6 +1,7 @@
 package Clases;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 public class Socio {
     static int contador = 0;
@@ -64,16 +65,17 @@ public class Socio {
 
     @Override
     public String toString() {
+        DateTimeFormatter formato = DateTimeFormatter.ofPattern("dd/MM/yyyy");
         return "Id Socio: " + idSocio + "\n"
                 +"Nombre: " + nombre + " " + apaterno + " " + amaterno + "\n"
                 + "Documento: " + num_documento + "\n"
-                + "Fecha de nacimiento: " + fecha_nacimiento + "\n"
+                + "Fecha de nacimiento: " + fecha_nacimiento.format(formato) + "\n"
                 + "Teléfono: " + telefono + "\n"
                 + "Pais: " + pais;
 
     }
 
-    public Socio(int idSocio, String nombre, String apaterno, String amaterno, int num_documento, LocalDate fecha_nacimiento, int telefono, String pais) {
+    public Socio(String nombre, String apaterno, String amaterno, int num_documento, LocalDate fecha_nacimiento, int telefono, String pais) {
         this.idSocio = ++contador;
         this.nombre = nombre;
         this.apaterno = apaterno;

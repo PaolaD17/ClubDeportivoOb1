@@ -2,6 +2,7 @@ package Clases;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 public class Reserva {
@@ -87,11 +88,12 @@ public class Reserva {
 
     @Override
     public String toString() {
+        DateTimeFormatter formato = DateTimeFormatter.ofPattern("dd/MM/yyyy");
         return "Id Reserva: " + idReserva + "\n" +
                 "Socio: " + socio.getNombre() + " - " + "Documento: " + socio.getNum_documento() + "\n" +
                 "Cancha: " + cancha.getNombre() + " - " + "Deporte: " + cancha.getDeporte() + "\n" +
-                "Fecha de reserva: " + fecha_reserva + "\n" +
-                "Fecha del partido: " + fecha_partido + "\n" +
+                "Fecha de reserva: " + fecha_reserva.format(formato) + "\n" +
+                "Fecha del partido: " + fecha_partido.format(formato) + "\n" +
                 "Hora del partido: " + hora_partido + "\n" +
                 "Duración del partido: " + duracion_partido + "\n" +
                 "Pago total: " +  pagoTotal + "\n" +

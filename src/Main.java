@@ -1,5 +1,6 @@
 import Gestores.GestionCanchas;
 import Gestores.GestionReservas;
+import Gestores.GestionSocios;
 
 import java.util.Scanner;
 
@@ -7,6 +8,7 @@ public class Main {
     public static void main(String[] args) {
         GestionCanchas gestorCanchas = new GestionCanchas();
         GestionReservas gestorReservas = new GestionReservas();
+        GestionSocios gestorSocios = new GestionSocios();
 
         Scanner sc = new Scanner(System.in);
         int opcion = -1;
@@ -26,7 +28,7 @@ public class Main {
                     gestorCanchas.mostrarMenuCanchas();
                     break;
                 case 2:
-                    //gestorSocios.mostrarMenuSocios();
+                    gestorSocios.mostrarMenuSocios();
                     break;
                 case 3:
                     //gestorTarifas.mostrarMenuTarifas();

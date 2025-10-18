@@ -87,7 +87,6 @@ public class GestionCanchas {
         int capacidad = sc.nextInt();
         sc.nextLine();
 
-        System.out.println("Estado: (disponible/reservada/ocupada)");
         String estado = "Disponible";
 
         System.out.println("Características: (separadas por coma)");
@@ -115,6 +114,7 @@ public class GestionCanchas {
 
         for (Cancha c : listaCanchas) {
             System.out.println(c);
+            System.out.println("-----------------");
         }
     }
 
@@ -122,7 +122,7 @@ public class GestionCanchas {
         System.out.println("--MODIFICAR CANCHAS--");
         System.out.println("Canchas disponibles:");
         for (Cancha c : listaCanchas) {
-            System.out.println("ID: " + c.getIdCancha() + " - " + c.getNombre());
+            System.out.println("ID: " + c.getIdCancha() + " - Nombre: " + c.getNombre());
         }
 
         System.out.print("Ingrese el ID de la cancha a modificar: ");
@@ -168,12 +168,6 @@ public class GestionCanchas {
         String capacidadStr = sc.nextLine();
         if (!capacidadStr.isBlank()){
             canchaAModificar.setCapacidad(Integer.parseInt(capacidadStr));
-        }
-
-        System.out.print("Nuevo estado (disponible/reservada/ocupada, enter para mantener): ");
-        String nuevoEstado = sc.nextLine();
-        if (!nuevoEstado.isBlank()){
-            canchaAModificar.setEstado(nuevoEstado);
         }
 
         System.out.print("Nuevas características (separadas por coma, enter para mantener): ");

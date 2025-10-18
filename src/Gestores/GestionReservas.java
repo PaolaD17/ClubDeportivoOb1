@@ -340,12 +340,12 @@ public class GestionReservas {
             reserva.setExtras(new ArrayList<>());
         }
 
-        System.out.print("¿Desea modificar la tarifa aplicada? (s/n): ");
+        /*System.out.print("¿Desea modificar la tarifa aplicada? (s/n): ");
         if (sc.nextLine().trim().equalsIgnoreCase("s")) {
             System.out.print("Ingrese el nombre de la nueva tarifa: ");
             String descripcionTarifa = sc.nextLine();
             reserva.setTarifaAplicada(new Tarifa(descripcionTarifa)); // suponiendo que tenés ese constructor
-        }
+        }*/
 
         guardarReservasEnArchivo();
         System.out.println("Reserva modificada con éxito.");
