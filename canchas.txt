@@ -1,0 +1,1 @@
+1;hola;futbol;true;10;disponible;iluminacion

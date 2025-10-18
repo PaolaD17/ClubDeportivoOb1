@@ -15,6 +15,9 @@ public class Cancha {
     public int getIdCancha() {
         return idCancha;
     }
+    public void setIdCancha(int idCancha) {
+        this.idCancha = idCancha;
+    }
     public String getNombre() {
         return nombre;
     }
