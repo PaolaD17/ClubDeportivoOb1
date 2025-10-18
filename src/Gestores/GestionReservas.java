@@ -24,6 +24,10 @@ public class GestionReservas {
         cargarReservasDesdeArchivo();
     }
 
+    public List<Reserva> getListaReservas() {
+        return listaReservas;
+    }
+
     public void mostrarMenuReservas(){
         int opcionReservas = -1;
         while (opcionReservas != 0){
@@ -194,7 +198,7 @@ public class GestionReservas {
         }
     }
 
-    public void modificarReserva() {
+    public void modificarReservas() {
         System.out.println("-- MODIFICAR RESERVA --");
 
         if (listaReservas.isEmpty()) {
@@ -351,6 +355,7 @@ public class GestionReservas {
 
         guardarReservasEnArchivo();
     }
+
     public void mostrarMenuConsultasR(){
         int opcionReservasConsultas = -1;
         while(opcionReservasConsultas != 0){
@@ -392,6 +397,15 @@ public class GestionReservas {
     public void CanchasSinReservaEnFechaDada(){
 
     }
+
+    /*public boolean canchaReservadaEnFecha(Cancha cancha, LocalDate fecha) {
+        for (Reserva r : listaReservas) {
+            if (r.getCancha().equals(cancha) && r.getFecha_partido().equals(fecha)) {
+                return true;
+            }
+        }
+        return false;
+    }*/
 
     public void guardarReservasEnArchivo() {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter("reservas.txt"))) {

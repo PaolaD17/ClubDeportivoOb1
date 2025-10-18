@@ -32,7 +32,7 @@ public class Main {
                     //gestorTarifas.mostrarMenuTarifas();
                     break;
                 case 4:
-                    //gestorReservas.mostrarMenuReservas();
+                    gestorReservas.mostrarMenuReservas();
                     break;
                 case 0:
                     System.out.println("Saliendo...");
