@@ -1,10 +1,12 @@
 import Gestores.GestionCanchas;
+import Gestores.GestionReservas;
 
 import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
         GestionCanchas gestorCanchas = new GestionCanchas();
+        GestionReservas gestorReservas = new GestionReservas();
 
         Scanner sc = new Scanner(System.in);
         int opcion = -1;

@@ -106,7 +106,6 @@ public class GestionCanchas {
         }
 
         for (Cancha c : listaCanchas) {
-            System.out.println("-------------------------");
             System.out.println(c);
         }
     }
@@ -371,6 +370,7 @@ public class GestionCanchas {
             System.out.println("Error al guardar las canchas: " + e.getMessage());
         }
     }
+
     public void cargarCanchasDesdeArchivo() {
         File archivo = new File("canchas.txt");
         if (!archivo.exists()) return;
