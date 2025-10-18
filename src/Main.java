@@ -6,8 +6,8 @@ import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
-        GestionCanchas gestorCanchas = new GestionCanchas();
         GestionReservas gestorReservas = new GestionReservas();
+        GestionCanchas gestorCanchas = new GestionCanchas(gestorReservas);
         GestionSocios gestorSocios = new GestionSocios();
 
         Scanner sc = new Scanner(System.in);
