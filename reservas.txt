@@ -1,2 +1,2 @@
-1;Paola;Tres Focos;2025-10-19;2025-10-20;20:30;1.0;true;;;null
-2;Mathias;Miguel Campomar;2025-10-19;2025-10-21;16:00;2.0;true;;Aumento de tiempo|300.0;Deporte: tenis | Monto: $2500.0 | Vigente desde: 2025-10-19
+1;Paola;Tres Focos;2025-10-19;2025-10-20;16:45;1.0;true;Jugamos 10;Aumento de tiempo|300.0;1000.0
+3;Mathias;Miguel Campomar;2025-10-19;2025-10-26;20:30;2.0;true;;Iluminación|100.0;2500.0

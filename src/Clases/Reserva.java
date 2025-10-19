@@ -89,6 +89,21 @@ public class Reserva {
     @Override
     public String toString() {
         DateTimeFormatter formato = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        String extrasTexto = "Servicios extras: ";
+        if (extras == null || extras.isEmpty()) {
+            extrasTexto += "Ninguno";
+        } else {
+            for (ServicioExtra extra : extras) {
+                extrasTexto += "\n  - " + extra.getDescripcion() + " ($" + extra.getCosto() + ")";
+            }
+        }
+        String tarifaTexto = "Tarifa aplicada: $";
+        if (tarifaAplicada == null) {
+            tarifaTexto += "No definida";
+        } else {
+            tarifaTexto += tarifaAplicada.getMonto();
+        }
+
         return "Id Reserva: " + idReserva + "\n" +
                 "Socio: " + socio.getNombre() + " - " + "Documento: " + socio.getNum_documento() + "\n" +
                 "Cancha: " + cancha.getNombre() + " - " + "Deporte: " + cancha.getDeporte() + "\n" +
@@ -96,10 +111,10 @@ public class Reserva {
                 "Fecha del partido: " + fecha_partido.format(formato) + "\n" +
                 "Hora del partido: " + hora_partido + "\n" +
                 "Duración del partido: " + duracion_partido + "\n" +
-                "Pago total: " +  pagoTotal + "\n" +
-                "Observaciones: " + observaciones + "\n" +
-                "Servicios extras: " + extras + "\n" +
-                "Tarifa aplicada: " +  tarifaAplicada;
+                "Pago total: " +  (pagoTotal ? "Sí" : "No") + "\n" +
+                "Observaciones: " + (observaciones.isEmpty() ? "Sin observaciones" : observaciones) + "\n" +
+                extrasTexto + "\n" +
+                tarifaTexto;
     }
 
     public Reserva(int idReserva, Socio socio, Cancha cancha, LocalDate fecha_reserva, LocalDate fecha_partido, LocalTime hora_partido, double duracion_partido, boolean pagoTotal, String observaciones, List<ServicioExtra> extras, Tarifa tarifaAplicada) {

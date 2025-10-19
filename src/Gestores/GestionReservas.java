@@ -279,6 +279,7 @@ public class GestionReservas {
         }
         for(Reserva r : listaReservas){
             System.out.println(r);
+            System.out.println("----------------");
         }
     }
 
@@ -435,7 +436,52 @@ public class GestionReservas {
         System.out.println("Reserva modificada con éxito.");
     }
 
-    public void eliminarReservas(){
+    public void eliminarReservas() {
+        System.out.println("-- ELIMINAR RESERVA --");
+
+        if (listaReservas.isEmpty()) {
+            System.out.println("No hay reservas registradas.");
+            return;
+        }
+
+        // Mostrar reservas con ID y resumen
+        for (Reserva r : listaReservas) {
+            System.out.println("ID: " + r.getIdReserva() + " | Socio: " + r.getSocio().getNombre() +
+                    " | Cancha: " + r.getCancha().getNombre() +
+                    " | Fecha partido: " + r.getFecha_partido() +
+                    " | Hora: " + r.getHora_partido());
+        }
+
+        System.out.print("Ingrese el ID de la reserva a eliminar: ");
+        int idEliminar;
+        try {
+            idEliminar = Integer.parseInt(sc.nextLine());
+        } catch (NumberFormatException e) {
+            System.out.println("ID inválido.");
+            return;
+        }
+
+        Reserva reservaAEliminar = null;
+        for (Reserva r : listaReservas) {
+            if (r.getIdReserva() == idEliminar) {
+                reservaAEliminar = r;
+                break;
+            }
+        }
+
+        if (reservaAEliminar == null) {
+            System.out.println("No se encontró una reserva con ese ID.");
+            return;
+        }
+
+        System.out.print("¿Está seguro que desea eliminar esta reserva? (s/n): ");
+        String confirmacion = sc.nextLine();
+        if (confirmacion.equalsIgnoreCase("s")) {
+            listaReservas.remove(reservaAEliminar);
+            System.out.println("Reserva eliminada con éxito.");
+        } else {
+            System.out.println("Operación cancelada.");
+        }
 
         guardarReservasEnArchivo();
     }
@@ -508,7 +554,10 @@ public class GestionReservas {
         boolean encontrado = false;
         for (Cancha c : listaCanchas) {
             if (idsReservadas.contains(c.getIdCancha())) {
-                System.out.println(c);
+                // ✅ Mostrar como "Reservada" temporalmente
+                System.out.println("Cancha: " + c.getNombre() +
+                        " | Deporte: " + c.getDeporte() +
+                        " | Estado: Reservada");
                 encontrado = true;
             }
         }
@@ -534,7 +583,9 @@ public class GestionReservas {
         boolean encontrado = false;
         for (Cancha c : listaCanchas) {
             if (!idsReservadas.contains(c.getIdCancha())) {
-                System.out.println(c);
+                System.out.println("Cancha: " + c.getNombre() +
+                        " | Deporte: " + c.getDeporte() +
+                        " | Estado: Disponible");
                 encontrado = true;
             }
         }
@@ -580,7 +631,7 @@ public class GestionReservas {
                         r.isPagoTotal() + ";" +
                         r.getObservaciones() + ";" +
                         extrasTexto + ";" +
-                        r.getTarifaAplicada();
+                        (r.getTarifaAplicada() != null ? r.getTarifaAplicada().getMonto() : "null");
                 writer.write(linea);
                 writer.newLine();
             }
@@ -611,7 +662,30 @@ public class GestionReservas {
                 Socio socio = buscarSocioPorNombre(nombreSocio);
                 Cancha cancha = buscarCanchaPorNombre(nombreCancha);
 
-                Reserva reserva = new Reserva(id, socio, cancha, fechaReserva, fechaPartido, horaPartido, duracion, pagoTotal, observaciones, new ArrayList<>(), null);
+                // Extras
+                List<ServicioExtra> extras = new ArrayList<>();
+                if (!partes[9].isEmpty()) {
+                    String[] extrasArray = partes[9].split(",");
+                    for (String extraStr : extrasArray) {
+                        String[] datos = extraStr.split("\\|");
+                        if (datos.length == 2) {
+                            String descripcion = datos[0];
+                            double costo = Double.parseDouble(datos[1]);
+                            extras.add(new ServicioExtra(descripcion, costo));
+                        }
+                    }
+                }
+
+                // Tarifa
+                Tarifa tarifa = null;
+                if (partes.length > 10 && partes[10] != null && !partes[10].equals("null")) {
+                    try {
+                        double monto = Double.parseDouble(partes[10]);
+                        tarifa = new Tarifa(cancha.getDeporte(), monto, fechaPartido);
+                    } catch (NumberFormatException ignored) {}
+                }
+
+                Reserva reserva = new Reserva(id, socio, cancha, fechaReserva, fechaPartido, horaPartido, duracion, pagoTotal, observaciones, extras, tarifa);
                 listaReservas.add(reserva);
             }
         } catch (IOException e) {
