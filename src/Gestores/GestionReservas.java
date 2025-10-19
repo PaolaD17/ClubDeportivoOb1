@@ -20,10 +20,11 @@ public class GestionReservas {
 
     private Scanner sc;
 
-    public GestionReservas(GestionTarifas gestionTarifas){
+    public GestionReservas(List<Socio> listaSocios, GestionTarifas gestionTarifas){
         this.gestionTarifas = gestionTarifas;
         this.gestionExtras = gestionExtras;
         this.listaReservas = new ArrayList<>();
+        this.listaSocios = new ArrayList<>();
         this.sc = new Scanner(System.in);
         cargarReservasDesdeArchivo();
     }
@@ -82,7 +83,7 @@ public class GestionReservas {
         System.out.println("--REGISTRAR RESERVAS--");
         System.out.println("-- Socios disponibles --");
         for (Socio s : listaSocios) {
-            System.out.println("ID: " + s.getIdSocio() + " - " + s.getNombre());
+            System.out.println("Cédula: " + s.getNum_documento() + " - " + s.getNombre());
         }
         System.out.print("Ingrese el ID del socio: ");
         int idSocioSeleccionado;
@@ -170,7 +171,7 @@ public class GestionReservas {
 
         List<ServicioExtra> extrasSeleccionados = new ArrayList<>();
         System.out.println("-- Servicios extras disponibles --");
-        List<ServicioExtra> disponibles = gestionExtras.getListaExtras();
+        List<ServicioExtra> disponibles = gestionExtras.getListaServiciosExtras();
         for (int i = 0; i < disponibles.size(); i++) {
             System.out.println((i + 1) + ". " + disponibles.get(i));
         }

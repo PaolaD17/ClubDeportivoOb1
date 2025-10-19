@@ -7,14 +7,14 @@ import java.io.*;
 import java.util.*;
 
 public class GestionServiciosExtras {
-    private List<ServicioExtra> listaExtras = new ArrayList<>();
+    private List<ServicioExtra> listaServiciosExtras = new ArrayList<>();
     private Scanner sc = new Scanner(System.in);
 
     public GestionServiciosExtras() {
-        cargarExtrasDesdeArchivo();
+        cargarServiciosExtrasDesdeArchivo();
     }
 
-    public void mostrarMenuExtras() {
+    public void mostrarMenuServiciosExtras() {
         int opcion = -1;
         while (opcion != 0) {
             System.out.println("--- GESTIÓN DE SERVICIOS EXTRAS ---");
@@ -26,10 +26,10 @@ public class GestionServiciosExtras {
 
             switch (opcion) {
                 case 1:
-                    registrarExtra();
+                    registrarServicioExtra();
                     break;
                 case 2:
-                    listarExtras();
+                    listarServiciosExtras();
                     break;
                 case 0:
                     System.out.println("Volviendo...");
@@ -39,7 +39,7 @@ public class GestionServiciosExtras {
         }
     }
 
-    public void registrarExtra() {
+    public void registrarServicioExtra() {
         System.out.print("Descripción del extra: ");
         String descripcion = sc.nextLine();
 
@@ -47,40 +47,40 @@ public class GestionServiciosExtras {
         double costo = Double.parseDouble(sc.nextLine());
 
         ServicioExtra nuevo = new ServicioExtra(descripcion, costo);
-        listaExtras.add(nuevo);
+        listaServiciosExtras.add(nuevo);
 
-        guardarExtrasEnArchivo();
+        guardarServiciosExtrasEnArchivo();
 
         System.out.println("Extra registrado.");
     }
 
-    public void listarExtras() {
-        if (listaExtras.isEmpty()) {
+    public void listarServiciosExtras() {
+        if (listaServiciosExtras.isEmpty()) {
             System.out.println("No hay extras registrados.");
             return;
         }
-        for (ServicioExtra se : listaExtras) {
+        for (ServicioExtra se : listaServiciosExtras) {
             System.out.println(se);
             System.out.println("-----------------");
         }
     }
 
-    public List<ServicioExtra> getListaExtras() {
-        return listaExtras;
+    public List<ServicioExtra> getListaServiciosExtras() {
+        return listaServiciosExtras;
     }
 
-    public void guardarExtrasEnArchivo() {
+    public void guardarServiciosExtrasEnArchivo() {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter("extras.txt"))) {
-            for (ServicioExtra e : listaExtras) {
+            for (ServicioExtra e : listaServiciosExtras) {
                 writer.write(e.getDescripcion() + ";" + e.getCosto());
                 writer.newLine();
             }
         } catch (IOException e) {
-            System.out.println("Error al guardar extras: " + e.getMessage());
+            System.out.println("Error al guardar servicios extras: " + e.getMessage());
         }
     }
 
-    public void cargarExtrasDesdeArchivo() {
+    public void cargarServiciosExtrasDesdeArchivo() {
         File archivo = new File("extras.txt");
         if (!archivo.exists()) return;
 
@@ -90,10 +90,10 @@ public class GestionServiciosExtras {
                 String[] partes = linea.split(";");
                 String descripcion = partes[0];
                 double costo = Double.parseDouble(partes[1]);
-                listaExtras.add(new ServicioExtra(descripcion, costo));
+                listaServiciosExtras.add(new ServicioExtra(descripcion, costo));
             }
         } catch (IOException e) {
-            System.out.println("Error al cargar extras: " + e.getMessage());
+            System.out.println("Error al cargar servicios extras: " + e.getMessage());
         }
     }
 }

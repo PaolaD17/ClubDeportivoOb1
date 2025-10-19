@@ -19,7 +19,7 @@ public class ServicioExtra {
 
     @Override
     public String toString() {
-        return "Descripcion: " + descripcion + "\n" +
+        return "Descripcion: " + descripcion +
                 " | Costo: $" + costo;
     }
 
