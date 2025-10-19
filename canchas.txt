@@ -1,1 +1,2 @@
-2;El Rancho;Fútbol;false;10;Disponible;Iluminación,pasto sintético
+1;Tres Focos;Fútbol;false;22;Disponible;Iluminación,cesped sintético
+2;Miguel Campomar;Tenis;true;4;Disponible;Iluminación,piso de cemento

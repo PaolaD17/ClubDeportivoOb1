@@ -7,6 +7,7 @@ import Clases.Socio;
 import java.io.*;
 import java.text.Normalizer;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
@@ -18,7 +19,7 @@ public class GestionCanchas {
     private GestionReservas gestionReservas;
     private Scanner sc;
 
-    public GestionCanchas(GestionReservas gestionReservas) {
+    public GestionCanchas() {
         this.listaCanchas = new ArrayList<>();
         this.gestionReservas = gestionReservas;
         this.sc = new Scanner(System.in);
@@ -241,7 +242,7 @@ public class GestionCanchas {
             System.out.println("Consultas de canchas");
             System.out.println("1. Canchas por deporte");
             System.out.println("2. Canchas por nombre");
-            System.out.println("3. Estado de cancha por fecha");
+            System.out.println("3. Estado de cancha por fecha y hora");
             System.out.println("4. Canchas por condición (cubiertas o descubiertas)");
             System.out.println("0. Salir");
 
@@ -255,7 +256,7 @@ public class GestionCanchas {
                     canchasPorNombre();
                     break;
                 case 3:
-                    estadoDeCanchasPorFecha();
+                    estadoDeCanchasPorFechaYHora();
                     break;
                 case 4:
                     canchasPorCondicion();
@@ -325,34 +326,45 @@ public class GestionCanchas {
         }
     }
 
-    public void estadoDeCanchasPorFecha() {
-        System.out.println("-- CONSULTA DE ESTADO DE CANCHA POR FECHA --");
+    public void estadoDeCanchasPorFechaYHora() {
+        System.out.println("-- ESTADO DE CANCHAS POR FECHA Y HORA --");
+
         System.out.print("Ingrese la fecha (dd-MM-yyyy): ");
         String fechaStr = sc.nextLine();
-
+        LocalDate fecha;
         try {
-            DateTimeFormatter formato = DateTimeFormatter.ofPattern("dd-MM-yyyy");
-            LocalDate fecha = LocalDate.parse(fechaStr, formato);
-
-            List<Reserva> reservas = gestionReservas.getListaReservas();
-
-            System.out.println("Estado de canchas para el día " + fecha.format(formato));
-            System.out.println("--------------------------------------------------");
-
-            for (Cancha cancha : listaCanchas) {
-                boolean reservada = reservas.stream()
-                        .anyMatch(r -> r.getCancha().getIdCancha() == cancha.getIdCancha()
-                                && r.getFecha_partido().equals(fecha));
-
-                String estado = reservada ? "Reservada" : "Disponible";
-
-                System.out.println("Cancha: " + cancha.getNombre() +
-                        " | Deporte: " + cancha.getDeporte() +
-                        " | Estado: " + estado);
-            }
-
+            fecha = LocalDate.parse(fechaStr, DateTimeFormatter.ofPattern("dd-MM-yyyy"));
         } catch (DateTimeParseException e) {
-            System.out.println("Fecha inválida. Intente nuevamente.");
+            System.out.println("Fecha inválida.");
+            return;
+        }
+
+        System.out.print("Ingrese la hora (HH:mm): ");
+        String horaStr = sc.nextLine();
+        LocalTime hora;
+        try {
+            hora = LocalTime.parse(horaStr, DateTimeFormatter.ofPattern("HH:mm"));
+        } catch (DateTimeParseException e) {
+            System.out.println("Hora inválida.");
+            return;
+        }
+
+        System.out.println("Estado de canchas para " + fecha.format(DateTimeFormatter.ofPattern("dd-MM-yyyy")) + " a las " + hora);
+        System.out.println("--------------------------------------------------");
+
+        for (Cancha cancha : listaCanchas) {
+            boolean reservada = gestionReservas.getListaReservas().stream().anyMatch(r -> {
+                boolean mismaCancha = r.getCancha().getIdCancha() == cancha.getIdCancha();
+                boolean mismaFecha = r.getFecha_partido().equals(fecha);
+
+                LocalTime inicio = r.getHora_partido();
+                LocalTime fin = inicio.plusMinutes((long)(r.getDuracion_partido() * 60));
+
+                return mismaCancha && mismaFecha && !hora.isBefore(inicio) && !hora.isAfter(fin);
+            });
+
+            String estado = reservada ? "Reservada" : "Disponible";
+            System.out.println("Cancha: " + cancha.getNombre() + " | Deporte: " + cancha.getDeporte() + " | Estado: " + estado);
         }
     }
 
@@ -393,6 +405,10 @@ public class GestionCanchas {
 
     public List<Cancha> getListaCanchas() {
         return listaCanchas;
+    }
+
+    public void setGestorReservas(GestionReservas gestorReservas) {
+        this.gestionReservas = gestorReservas;
     }
 
     public void guardarCanchasEnArchivo() {
@@ -442,5 +458,13 @@ public class GestionCanchas {
         } catch (IOException e) {
             System.out.println("Error al cargar las canchas: " + e.getMessage());
         }
+        int maxId = 0;
+        for (Cancha c : listaCanchas) {
+            if (c.getIdCancha() > maxId) {
+                maxId = c.getIdCancha();
+            }
+        }
+        Cancha.setContador(maxId);
     }
+
 }

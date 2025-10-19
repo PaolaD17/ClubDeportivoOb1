@@ -13,21 +13,22 @@ import java.time.LocalTime;
 
 public class GestionReservas {
     private List<Reserva> listaReservas;
+    private List<Cancha> listaCanchas;
     private GestionCanchas gestionCanchas;
     private GestionSocios gestionSocios;
     private GestionTarifas gestionTarifas;
     private GestionServiciosExtras gestionExtras;
     private Scanner sc;
 
-    public GestionReservas(GestionCanchas gestionCanchas, GestionSocios gestionSocios, GestionTarifas gestionTarifas, GestionServiciosExtras gestionExtras){
+    public GestionReservas(List<Cancha> listaCanchas, GestionSocios gestionSocios, GestionTarifas gestionTarifas, GestionServiciosExtras gestionExtras){
+        this.listaCanchas = listaCanchas;
         this.gestionSocios = gestionSocios;
         this.gestionTarifas = gestionTarifas;
         this.gestionExtras = gestionExtras;
         this.listaReservas = new ArrayList<>();
-        this.listaCanchas = listaCanchas; // ✅ ahora sí, inicializada correctamente
         this.sc = new Scanner(System.in);
-
         cargarReservasDesdeArchivo();
+
     }
 
     public List<Reserva> getListaReservas() {
@@ -116,6 +117,10 @@ public class GestionReservas {
         String fechaTexto = sc.nextLine();
         DateTimeFormatter f = DateTimeFormatter.ofPattern("dd/MM/yyyy");
         LocalDate fechaPartido = LocalDate.parse(fechaTexto, f);
+        if (fechaPartido.isBefore(LocalDate.now())) {
+            System.out.println("La fecha del partido debe ser futura.");
+            return;
+        }
 
         System.out.println("Hora del partido: (hh:mm)");
         String horaTexto = sc.nextLine();
@@ -197,8 +202,8 @@ public class GestionReservas {
 
         List<ServicioExtra> extrasSeleccionados = new ArrayList<>();
         System.out.println("-- Servicios extras disponibles --");
-        List<ServicioExtra> disponibles = gestionExtras.getListaServiciosExtras();
-        for (int i = 0; i < disponibles.size(); i++) {
+        List<ServicioExtra> extrasDisponibles = gestionExtras.getListaServiciosExtras();
+        for (int i = 0; i < extrasDisponibles.size(); i++) {
             System.out.println((i + 1) + ". " + disponibles.get(i));
         }
         System.out.println("Ingrese los números de extras separados por coma (o enter para ninguno):");
@@ -209,7 +214,7 @@ public class GestionReservas {
                 try {
                     int i = Integer.parseInt(idx.trim()) - 1;
                     if (i >= 0 && i < disponibles.size()) {
-                        extrasSeleccionados.add(disponibles.get(i));
+                        extrasSeleccionados.add(extrasDisponibles.get(i));
                     }
                 } catch (NumberFormatException ignored) {}
             }
@@ -465,16 +470,95 @@ public class GestionReservas {
         }
     }
 
-    public void ReservasEnFechasDadas(){
+    public void ReservasEnFechasDadas() {
+        System.out.println("-- CONSULTA DE RESERVAS EN PERÍODO --");
 
+        System.out.print("Fecha inicio (dd/MM/yyyy): ");
+        LocalDate inicio = LocalDate.parse(sc.nextLine(), DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+
+        System.out.print("Fecha fin (dd/MM/yyyy): ");
+        LocalDate fin = LocalDate.parse(sc.nextLine(), DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+
+        boolean encontrado = false;
+        for (Reserva r : listaReservas) {
+            if (!r.getFecha_partido().isBefore(inicio) && !r.getFecha_partido().isAfter(fin)) {
+                System.out.println(r);
+                encontrado = true;
+            }
+        }
+
+        if (!encontrado) {
+            System.out.println("No hay reservas en ese período.");
+        }
     }
 
-    public void CanchasConReservaEnFechaDada(){
+    public void CanchasConReservaEnFechaDada() {
+        System.out.println("-- CANCHAS CON RESERVA EN FECHA --");
 
+        System.out.print("Fecha (dd/MM/yyyy): ");
+        LocalDate fecha = LocalDate.parse(sc.nextLine(), DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+
+        List<Integer> idsReservadas = new ArrayList<>();
+        for (Reserva r : listaReservas) {
+            if (r.getFecha_partido().equals(fecha)) {
+                idsReservadas.add(r.getCancha().getIdCancha());
+            }
+        }
+
+        boolean encontrado = false;
+        for (Cancha c : listaCanchas) {
+            if (idsReservadas.contains(c.getIdCancha())) {
+                System.out.println(c);
+                encontrado = true;
+            }
+        }
+
+        if (!encontrado) {
+            System.out.println("No hay canchas reservadas en esa fecha.");
+        }
     }
 
-    public void CanchasSinReservaEnFechaDada(){
+    public void CanchasSinReservaEnFechaDada() {
+        System.out.println("-- CANCHAS SIN RESERVA EN FECHA --");
 
+        System.out.print("Fecha (dd/MM/yyyy): ");
+        LocalDate fecha = LocalDate.parse(sc.nextLine(), DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+
+        List<Integer> idsReservadas = new ArrayList<>();
+        for (Reserva r : listaReservas) {
+            if (r.getFecha_partido().equals(fecha)) {
+                idsReservadas.add(r.getCancha().getIdCancha());
+            }
+        }
+
+        boolean encontrado = false;
+        for (Cancha c : listaCanchas) {
+            if (!idsReservadas.contains(c.getIdCancha())) {
+                System.out.println(c);
+                encontrado = true;
+            }
+        }
+
+        if (!encontrado) {
+            System.out.println("Todas las canchas están reservadas en esa fecha.");
+        }
+    }
+
+    public boolean estaDisponible(Cancha cancha, LocalDate fecha, LocalTime hora, double duracion) {
+        return listaReservas.stream().noneMatch(r -> {
+            boolean mismaCancha = r.getCancha().getIdCancha() == cancha.getIdCancha();
+            boolean mismaFecha = r.getFecha_partido().equals(fecha);
+
+            LocalTime inicioExistente = r.getHora_partido();
+            LocalTime finExistente = inicioExistente.plusMinutes((long)(r.getDuracion_partido() * 60));
+
+            LocalTime inicioNueva = hora;
+            LocalTime finNueva = hora.plusMinutes((long)(duracion * 60));
+
+            boolean seCruzan = !finNueva.isBefore(inicioExistente) && !inicioNueva.isAfter(finExistente);
+
+            return mismaCancha && mismaFecha && seCruzan;
+        });
     }
 
     public void guardarReservasEnArchivo() {

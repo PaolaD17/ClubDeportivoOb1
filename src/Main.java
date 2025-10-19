@@ -16,7 +16,7 @@ public class Main {
         GestionCanchas gestorCanchas = new GestionCanchas(); // 5️⃣ primero creás las canchas
         List<Cancha> canchas = gestorCanchas.getListaCanchas(); // 6️⃣ obtenés la lista
 
-        GestionReservas gestorReservas = new GestionReservas(gestorSocios, gestorTarifas, gestorServiciosExtras, canchas); // 7️⃣ ahora sí, con todo lo necesario
+        GestionReservas gestorReservas = new GestionReservas(canchas, gestorSocios, gestorTarifas, gestorServiciosExtras);
 
         gestorCanchas.setGestorReservas(gestorReservas);
 

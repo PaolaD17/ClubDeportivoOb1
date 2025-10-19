@@ -12,6 +12,10 @@ public class Cancha {
     private String estado;
     private List<String> caracteristicas;
 
+    public static void setContador(int nuevoValor) {
+        contador = nuevoValor;
+    }
+
     public int getIdCancha() {
         return idCancha;
     }
