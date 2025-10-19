@@ -20,7 +20,7 @@ public class ServicioExtra {
     @Override
     public String toString() {
         return "Descripcion: " + descripcion + "\n" +
-                ", Costo: " + costo;
+                " | Costo: $" + costo;
     }
 
     public ServicioExtra(String descripcion, double costo) {

@@ -15,10 +15,14 @@ public class GestionReservas {
     private List<Reserva> listaReservas;
     private List<Cancha> listaCanchas;
     private List<Socio> listaSocios;
+    private GestionTarifas gestionTarifas;
+    private GestionServiciosExtras gestionExtras;
 
     private Scanner sc;
 
-    public GestionReservas(){
+    public GestionReservas(GestionTarifas gestionTarifas){
+        this.gestionTarifas = gestionTarifas;
+        this.gestionExtras = gestionExtras;
         this.listaReservas = new ArrayList<>();
         this.sc = new Scanner(System.in);
         cargarReservasDesdeArchivo();
@@ -69,7 +73,7 @@ public class GestionReservas {
                     System.out.println("Volviendo al menú principal...");
                     break;
                 default:
-                    System.out.println("Opción no válida. Intente de nuevo.");
+                    System.out.println("Opción inválida. Intente de nuevo.");
             }
         }
     }
@@ -164,6 +168,54 @@ public class GestionReservas {
         System.out.print("Observaciones (opcional): ");
         String observaciones = sc.nextLine();
 
+        List<ServicioExtra> extrasSeleccionados = new ArrayList<>();
+        System.out.println("-- Servicios extras disponibles --");
+        List<ServicioExtra> disponibles = gestionExtras.getListaExtras();
+        for (int i = 0; i < disponibles.size(); i++) {
+            System.out.println((i + 1) + ". " + disponibles.get(i));
+        }
+        System.out.println("Ingrese los números de extras separados por coma (o enter para ninguno):");
+        String entradaExtras = sc.nextLine().trim();
+        if (!entradaExtras.isEmpty()) {
+            String[] indices = entradaExtras.split(",");
+            for (String idx : indices) {
+                try {
+                    int i = Integer.parseInt(idx.trim()) - 1;
+                    if (i >= 0 && i < disponibles.size()) {
+                        extrasSeleccionados.add(disponibles.get(i));
+                    }
+                } catch (NumberFormatException ignored) {}
+            }
+        }
+
+        Tarifa tarifaAplicada = gestionTarifas.obtenerTarifaVigente(canchaSeleccionada.getDeporte(), fechaPartido);
+        if (tarifaAplicada == null) {
+            System.out.println("No hay tarifa vigente para ese deporte en esa fecha.");
+            return;
+        }
+        System.out.println("Tarifa aplicada: $" + tarifaAplicada.getMonto());
+
+        final int idCancha = canchaSeleccionada.getIdCancha();
+        boolean haySuperposicion = listaReservas.stream().anyMatch(r -> {
+            boolean mismaCancha = r.getCancha().getIdCancha() == idCancha;
+            boolean mismaFecha = r.getFecha_partido().equals(fechaPartido);
+
+            LocalTime inicioExistente = r.getHora_partido();
+            LocalTime finExistente = inicioExistente.plusMinutes((long)(r.getDuracion_partido() * 60));
+
+            LocalTime inicioNueva = horaPartido;
+            LocalTime finNueva = horaPartido.plusMinutes((long)(duracion * 60));
+
+            boolean seCruzan = !finNueva.isBefore(inicioExistente) && !inicioNueva.isAfter(finExistente);
+
+            return mismaCancha && mismaFecha && seCruzan;
+        });
+
+        if (haySuperposicion) {
+            System.out.println("Ya existe una reserva que se superpone con ese horario en la cancha seleccionada.");
+            return;
+        }
+
         Reserva nuevaReserva = new Reserva(
                 0, // el ID se asigna automáticamente en el constructor
                 socioSeleccionado,
@@ -174,8 +226,8 @@ public class GestionReservas {
                 duracion,
                 pagoTotal,
                 observaciones,
-                new ArrayList<>(), // extras vacíos por ahora
-                null // tarifa nula por ahora
+                extrasSeleccionados,
+                tarifaAplicada
         );
 
         listaReservas.add(nuevaReserva);
@@ -397,15 +449,6 @@ public class GestionReservas {
     public void CanchasSinReservaEnFechaDada(){
 
     }
-
-    /*public boolean canchaReservadaEnFecha(Cancha cancha, LocalDate fecha) {
-        for (Reserva r : listaReservas) {
-            if (r.getCancha().equals(cancha) && r.getFecha_partido().equals(fecha)) {
-                return true;
-            }
-        }
-        return false;
-    }*/
 
     public void guardarReservasEnArchivo() {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter("reservas.txt"))) {

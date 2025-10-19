@@ -254,7 +254,7 @@ public class GestionCanchas {
                     canchasPorNombre();
                     break;
                 case 3:
-//                    estadoDeCanchasPorFecha();
+                    estadoDeCanchasPorFecha();
                     break;
                 case 4:
                     canchasPorCondicion();
