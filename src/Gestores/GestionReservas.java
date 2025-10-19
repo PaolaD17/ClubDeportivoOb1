@@ -87,12 +87,12 @@ public class GestionReservas {
         for (Socio s : gestionSocios.getListaSocios()) {
             System.out.println("ID: " + s.getIdSocio() + " | Cédula: " + s.getNum_documento() + " | Nombre: " + s.getNombre() + " " + s.getApaterno());
         }
-        System.out.print("Ingrese la cédula del socio: ");
+        System.out.print("Ingrese el ID del socio: ");
         int idSocioSeleccionado;
         try {
             idSocioSeleccionado = Integer.parseInt(sc.nextLine());
         } catch (NumberFormatException e) {
-            System.out.println("Cédula inválida.");
+            System.out.println("ID inválido.");
             return;
         }
         Socio socioSeleccionado = null;
@@ -204,16 +204,16 @@ public class GestionReservas {
         System.out.println("-- Servicios extras disponibles --");
         List<ServicioExtra> extrasDisponibles = gestionExtras.getListaServiciosExtras();
         for (int i = 0; i < extrasDisponibles.size(); i++) {
-            System.out.println((i + 1) + ". " + disponibles.get(i));
+            System.out.println((i + 1) + ". " + extrasDisponibles.get(i));
         }
-        System.out.println("Ingrese los números de extras separados por coma (o enter para ninguno):");
+        System.out.println("Ingrese los ID de servicios extras separados por coma (o enter para ninguno):");
         String entradaExtras = sc.nextLine().trim();
         if (!entradaExtras.isEmpty()) {
             String[] indices = entradaExtras.split(",");
             for (String idx : indices) {
                 try {
                     int i = Integer.parseInt(idx.trim()) - 1;
-                    if (i >= 0 && i < disponibles.size()) {
+                    if (i >= 0 && i < extrasDisponibles.size()) {
                         extrasSeleccionados.add(extrasDisponibles.get(i));
                     }
                 } catch (NumberFormatException ignored) {}

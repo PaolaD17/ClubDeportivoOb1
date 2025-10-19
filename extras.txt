@@ -1,1 +1,2 @@
 Iluminación;100.0
+Aumento de tiempo;300.0
