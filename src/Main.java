@@ -1,18 +1,24 @@
+import Clases.Cancha;
+import Clases.Socio;
 import Gestores.*;
 
+import java.util.List;
 import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
-        GestionTarifas gestorTarifas = new GestionTarifas(); // 1️⃣ primero: lo necesita Reservas
-        GestionServiciosExtras gestorServiciosExtras = new GestionServiciosExtras(); // 2️⃣ también lo necesita Reservas
+        GestionTarifas gestorTarifas = new GestionTarifas(); // 1️⃣
+        GestionServiciosExtras gestorServiciosExtras = new GestionServiciosExtras(); // 2️⃣
 
-        GestionSocios gestorSocios = new GestionSocios(); // 3️⃣ luego: para obtener la lista de socios
-        List<Socio> socios = gestorSocios.getListaSocios(); // 4️⃣ obtenés la lista
+        GestionSocios gestorSocios = new GestionSocios(); // 3️⃣
+        List<Socio> socios = gestorSocios.getListaSocios(); // 4️⃣
 
-        GestionReservas gestorReservas = new GestionReservas(socios, gestorTarifas, gestorServiciosExtras); // 5️⃣ ahora sí: con todo lo necesario
+        GestionCanchas gestorCanchas = new GestionCanchas(); // 5️⃣ primero creás las canchas
+        List<Cancha> canchas = gestorCanchas.getListaCanchas(); // 6️⃣ obtenés la lista
 
-        GestionCanchas gestorCanchas = new GestionCanchas(gestorReservas); // 6️⃣ finalmente: depende de Reservas
+        GestionReservas gestorReservas = new GestionReservas(gestorSocios, gestorTarifas, gestorServiciosExtras, canchas); // 7️⃣ ahora sí, con todo lo necesario
+
+        gestorCanchas.setGestorReservas(gestorReservas);
 
         Scanner sc = new Scanner(System.in);
         int opcion = -1;

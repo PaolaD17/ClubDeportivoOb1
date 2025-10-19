@@ -2,6 +2,7 @@ package Gestores;
 
 import Clases.Cancha;
 import Clases.Reserva;
+import Clases.Socio;
 
 import java.io.*;
 import java.text.Normalizer;
@@ -388,6 +389,10 @@ public class GestionCanchas {
         if (!encontrado) {
             System.out.println("No se encontraron canchas " + (buscarCubiertas ? "cubiertas." : "descubiertas."));
         }
+    }
+
+    public List<Cancha> getListaCanchas() {
+        return listaCanchas;
     }
 
     public void guardarCanchasEnArchivo() {

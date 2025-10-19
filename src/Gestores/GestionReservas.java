@@ -13,19 +13,20 @@ import java.time.LocalTime;
 
 public class GestionReservas {
     private List<Reserva> listaReservas;
-    private List<Cancha> listaCanchas;
-    private List<Socio> listaSocios;
+    private GestionCanchas gestionCanchas;
+    private GestionSocios gestionSocios;
     private GestionTarifas gestionTarifas;
     private GestionServiciosExtras gestionExtras;
-
     private Scanner sc;
 
-    public GestionReservas(List<Socio> listaSocios, GestionTarifas gestionTarifas){
+    public GestionReservas(GestionCanchas gestionCanchas, GestionSocios gestionSocios, GestionTarifas gestionTarifas, GestionServiciosExtras gestionExtras){
+        this.gestionSocios = gestionSocios;
         this.gestionTarifas = gestionTarifas;
         this.gestionExtras = gestionExtras;
         this.listaReservas = new ArrayList<>();
-        this.listaSocios = new ArrayList<>();
+        this.listaCanchas = listaCanchas; // ✅ ahora sí, inicializada correctamente
         this.sc = new Scanner(System.in);
+
         cargarReservasDesdeArchivo();
     }
 
@@ -82,19 +83,19 @@ public class GestionReservas {
     public void registrarReservas(){
         System.out.println("--REGISTRAR RESERVAS--");
         System.out.println("-- Socios disponibles --");
-        for (Socio s : listaSocios) {
-            System.out.println("Cédula: " + s.getNum_documento() + " - " + s.getNombre());
+        for (Socio s : gestionSocios.getListaSocios()) {
+            System.out.println("ID: " + s.getIdSocio() + " | Cédula: " + s.getNum_documento() + " | Nombre: " + s.getNombre() + " " + s.getApaterno());
         }
-        System.out.print("Ingrese el ID del socio: ");
+        System.out.print("Ingrese la cédula del socio: ");
         int idSocioSeleccionado;
         try {
             idSocioSeleccionado = Integer.parseInt(sc.nextLine());
         } catch (NumberFormatException e) {
-            System.out.println("ID inválido.");
+            System.out.println("Cédula inválida.");
             return;
         }
         Socio socioSeleccionado = null;
-        for (Socio s : listaSocios) {
+        for (Socio s : gestionSocios.getListaSocios()) {
             if (s.getIdSocio() == idSocioSeleccionado) {
                 socioSeleccionado = s;
                 break;
@@ -106,32 +107,6 @@ public class GestionReservas {
         }
         System.out.println("Socio seleccionado:");
         System.out.println("ID: " + socioSeleccionado.getIdSocio() + " - Nombre: " + socioSeleccionado.getNombre());
-
-        System.out.println("--Canchas disponibles--");
-        for (Cancha c : listaCanchas){
-            System.out.println("ID: " + c.getIdCancha() + " - " + c.getNombre() + " - " + c.getDeporte());
-        }
-        System.out.println("Ingrese el ID de la cancha:");
-        int idCanchaSeleccionada;
-        try{
-            idCanchaSeleccionada = Integer.parseInt(sc.nextLine());
-        }catch (NumberFormatException e) {
-            System.out.println("ID inválido.");
-            return;
-        }
-        Cancha canchaSeleccionada = null;
-        for(Cancha c : listaCanchas){
-            if(c.getIdCancha() == idCanchaSeleccionada){
-                canchaSeleccionada = c;
-                break;
-            }
-        }
-        if(canchaSeleccionada == null){
-            System.out.println("No se encontró una cancha con ese ID.");
-            return;
-        }
-        System.out.println("Cancha seleccionada: ");
-        System.out.println("ID: " + canchaSeleccionada.getIdCancha() + " - Nombre: " + canchaSeleccionada.getNombre() + " - Deporte: " + canchaSeleccionada.getDeporte());
 
         LocalDate hoy = LocalDate.now();
         DateTimeFormatter formato = DateTimeFormatter.ofPattern("dd/MM/yyyy");
@@ -161,6 +136,57 @@ public class GestionReservas {
             System.out.println("Duración inválida.");
             return;
         }
+
+        System.out.println("--Canchas disponibles para ese horario--");
+        List<Cancha> disponibles = new ArrayList<>();
+        for (Cancha c : listaCanchas) {
+            boolean ocupada = listaReservas.stream().anyMatch(r -> {
+                boolean mismaCancha = r.getCancha().getIdCancha() == c.getIdCancha();
+                boolean mismaFecha = r.getFecha_partido().equals(fechaPartido);
+
+                LocalTime inicioExistente = r.getHora_partido();
+                LocalTime finExistente = inicioExistente.plusMinutes((long) (r.getDuracion_partido() * 60));
+
+                LocalTime inicioNueva = horaPartido;
+                LocalTime finNueva = horaPartido.plusMinutes((long) (duracion * 60));
+
+                boolean seCruzan = !finNueva.isBefore(inicioExistente) && !inicioNueva.isAfter(finExistente);
+
+                return mismaCancha && mismaFecha && seCruzan;
+            });
+
+            if (!ocupada) {
+                disponibles.add(c);
+            }
+        }
+        if (disponibles.isEmpty()) {
+            System.out.println("No hay canchas disponibles en ese horario.");
+            return;
+        }
+        for (Cancha c : disponibles) {
+            System.out.println("ID: " + c.getIdCancha() + " - " + c.getNombre() + " - " + c.getDeporte());
+        }
+        System.out.println("Ingrese el ID de la cancha:");
+        int idCanchaSeleccionada;
+        try{
+            idCanchaSeleccionada = Integer.parseInt(sc.nextLine());
+        }catch (NumberFormatException e) {
+            System.out.println("ID inválido.");
+            return;
+        }
+        Cancha canchaSeleccionada = null;
+        for(Cancha c : listaCanchas){
+            if(c.getIdCancha() == idCanchaSeleccionada){
+                canchaSeleccionada = c;
+                break;
+            }
+        }
+        if(canchaSeleccionada == null){
+            System.out.println("No se encontró una cancha con ese ID.");
+            return;
+        }
+        System.out.println("Cancha seleccionada: ");
+        System.out.println("ID: " + canchaSeleccionada.getIdCancha() + " - Nombre: " + canchaSeleccionada.getNombre() + " - Deporte: " + canchaSeleccionada.getDeporte());
 
         System.out.print("¿Pago total realizado? (s/n): ");
         String pagoStr = sc.nextLine().trim().toLowerCase();
@@ -294,14 +320,14 @@ public class GestionReservas {
         System.out.print("¿Desea modificar el socio? (s/n): ");
         if (sc.nextLine().trim().equalsIgnoreCase("s")) {
             System.out.println("-- Socios disponibles --");
-            for (Socio s : listaSocios) {
+            for (Socio s : gestionSocios.getListaSocios()) {
                 System.out.println("ID: " + s.getIdSocio() + " - " + s.getNombre());
             }
             System.out.print("Ingrese el nuevo ID del socio: ");
             int nuevoId;
             try {
                 nuevoId = Integer.parseInt(sc.nextLine());
-                for (Socio s : listaSocios) {
+                for (Socio s : gestionSocios.getListaSocios()) {
                     if (s.getIdSocio() == nuevoId) {
                         reserva.setSocio(s);
                         break;
@@ -510,7 +536,7 @@ public class GestionReservas {
     }
 
     private Socio buscarSocioPorNombre(String nombre) {
-        for (Socio s : listaSocios) {
+        for (Socio s : gestionSocios.getListaSocios()) {
             if (s.getNombre().equalsIgnoreCase(nombre)) return s;
         }
         return null;

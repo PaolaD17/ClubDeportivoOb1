@@ -238,6 +238,10 @@ public class GestionSocios {
         guardarSociosEnArchivo();
     }
 
+    public List<Socio> getListaSocios() {
+        return listaSocios;
+    }
+
     public void guardarSociosEnArchivo() {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter("socios.txt"))) {
             for (Socio s : listaSocios) {
