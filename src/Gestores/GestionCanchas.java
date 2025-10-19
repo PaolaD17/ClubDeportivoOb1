@@ -1,8 +1,6 @@
 package Gestores;
 
 import Clases.Cancha;
-import Clases.Reserva;
-import Clases.Socio;
 
 import java.io.*;
 import java.text.Normalizer;
@@ -17,6 +15,7 @@ import java.util.Scanner;
 public class GestionCanchas {
     private List<Cancha> listaCanchas;
     private GestionReservas gestionReservas;
+
     private Scanner sc;
 
     public GestionCanchas() {
@@ -30,11 +29,11 @@ public class GestionCanchas {
     public void mostrarMenuCanchas() {
         int opcionCanchas = -1;
         while (opcionCanchas != 0) {
-            System.out.println("--- GESTIÓN DE CANCHAS ---");
-            System.out.println("1. Registrar una cancha");
+            System.out.println("--GESTIÓN DE CANCHAS--");
+            System.out.println("1. Registrar cancha");
             System.out.println("2. Listar canchas");
-            System.out.println("3. Modificar una cancha");
-            System.out.println("4. Eliminar una cancha");
+            System.out.println("3. Modificar cancha");
+            System.out.println("4. Eliminar cancha");
             System.out.println("5. Consultas");
             System.out.println("0. Volver al Menú Principal");
 
@@ -74,23 +73,30 @@ public class GestionCanchas {
     }
 
     public void registrarCanchas() {
-        System.out.println("--REGISTRAR CANCHAS--");
+        System.out.println("--REGISTRO DE CANCHAS--");
+
+        //Registro de nombre
         System.out.println("Nombre: ");
         String nombre = sc.nextLine();
 
+        //Registro de deporte
         System.out.println("Deporte: ");
         String deporte = sc.nextLine();
 
+        //Registro de condición (si es cubierta o descubierta)
         System.out.println("¿Cubierta? S/N");
         String cubiertaStr = sc.nextLine();
         boolean cubierta = cubiertaStr.equalsIgnoreCase("s");
 
+        //Registro de capacidad (cantidad de jugadores)
         System.out.println("Capacidad: ");
         int capacidad = sc.nextInt();
         sc.nextLine();
 
+        //Registro de estado (por defecto será "disponible")
         String estado = "Disponible";
 
+        //Registro de características
         System.out.println("Características: (separadas por coma)");
         String[] caracteristicasArray = sc.nextLine().split(",");
         List<String> caracteristicas = new ArrayList<>();

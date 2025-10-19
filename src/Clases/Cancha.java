@@ -53,7 +53,7 @@ public class Cancha {
         if (estado.equalsIgnoreCase("disponible") || estado.equalsIgnoreCase("reservada") || estado.equalsIgnoreCase("ocupada")) {
             this.estado = estado.toLowerCase();
         } else {
-            System.out.println("⚠️ Estado inválido. Debe ser disponible, reservada u ocupada.");
+            System.out.println("Estado inválido. Debe ser disponible, reservada u ocupada.");
         }
     }
     public List<String> getCaracteristicas() {

@@ -1,6 +1,7 @@
 package Clases;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 public class Tarifa {
     private String deporte;
@@ -28,9 +29,10 @@ public class Tarifa {
 
     @Override
     public String toString() {
+        DateTimeFormatter formato = DateTimeFormatter.ofPattern("dd/MM/yyyy");
         return "Deporte: " + deporte +
                 " | Monto: $" + monto +
-                " | Vigente desde: " + fechaVigencia;
+                " | Vigente desde: " + fechaVigencia.format(formato);
     }
 
     public Tarifa(String deporte, double monto, LocalDate fechaVigencia) {

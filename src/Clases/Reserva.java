@@ -94,7 +94,7 @@ public class Reserva {
             extrasTexto += "Ninguno";
         } else {
             for (ServicioExtra extra : extras) {
-                extrasTexto += "\n  - " + extra.getDescripcion() + " ($" + extra.getCosto() + ")";
+                extrasTexto += "\n  - " + extra.getDescripcion() + " $" + extra.getCosto();
             }
         }
         String tarifaTexto = "Tarifa aplicada: $";
@@ -105,8 +105,8 @@ public class Reserva {
         }
 
         return "Id Reserva: " + idReserva + "\n" +
-                "Socio: " + socio.getNombre() + " - " + "Documento: " + socio.getNum_documento() + "\n" +
-                "Cancha: " + cancha.getNombre() + " - " + "Deporte: " + cancha.getDeporte() + "\n" +
+                "Socio: " + socio.getNombre() + " | " + "Documento: " + socio.getNum_documento() + "\n" +
+                "Cancha: " + cancha.getNombre() + " | " + "Deporte: " + cancha.getDeporte() + "\n" +
                 "Fecha de reserva: " + fecha_reserva.format(formato) + "\n" +
                 "Fecha del partido: " + fecha_partido.format(formato) + "\n" +
                 "Hora del partido: " + hora_partido + "\n" +
