@@ -1,6 +1,5 @@
 package Gestores;
 
-import Clases.Cancha;
 import Clases.ServicioExtra;
 
 import java.io.*;
@@ -14,13 +13,18 @@ public class GestionServiciosExtras {
         cargarServiciosExtrasDesdeArchivo();
     }
 
+    public List<ServicioExtra> getListaServiciosExtras() {
+        return listaServiciosExtras;
+    }
+
     public void mostrarMenuServiciosExtras() {
         int opcion = -1;
         while (opcion != 0) {
-            System.out.println("--- GESTIÓN DE SERVICIOS EXTRAS ---");
+            System.out.println("--GESTIÓN DE SERVICIOS EXTRAS--");
             System.out.println("1. Registrar servicio extra");
             System.out.println("2. Listar servicios extras");
             System.out.println("0. Volver");
+
             System.out.print("Seleccione una opción: ");
             opcion = Integer.parseInt(sc.nextLine());
 
@@ -32,7 +36,7 @@ public class GestionServiciosExtras {
                     listarServiciosExtras();
                     break;
                 case 0:
-                    System.out.println("Volviendo...");
+                    System.out.println("Volver al menú principal...");
                 default:
                     System.out.println("Opción inválida.");
             }
@@ -40,33 +44,32 @@ public class GestionServiciosExtras {
     }
 
     public void registrarServicioExtra() {
-        System.out.print("Descripción del extra: ");
+        //Registrar descripción
+        System.out.print("Descripción del servicio extra: ");
         String descripcion = sc.nextLine();
 
+        //Registrar costo
         System.out.print("Costo: ");
         double costo = Double.parseDouble(sc.nextLine());
 
+        //Creo el nuevo servicio extra y lo agrego a la listaServiciosExtras
         ServicioExtra nuevo = new ServicioExtra(descripcion, costo);
         listaServiciosExtras.add(nuevo);
 
         guardarServiciosExtrasEnArchivo();
 
-        System.out.println("Extra registrado.");
+        System.out.println("Servicio extra registrado.");
     }
 
     public void listarServiciosExtras() {
         if (listaServiciosExtras.isEmpty()) {
-            System.out.println("No hay extras registrados.");
+            System.out.println("No hay servicios extras registrados.");
             return;
         }
         for (ServicioExtra se : listaServiciosExtras) {
             System.out.println(se);
             System.out.println("-----------------");
         }
-    }
-
-    public List<ServicioExtra> getListaServiciosExtras() {
-        return listaServiciosExtras;
     }
 
     public void guardarServiciosExtrasEnArchivo() {

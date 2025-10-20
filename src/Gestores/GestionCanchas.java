@@ -1,6 +1,7 @@
 package Gestores;
 
 import Clases.Cancha;
+import Clases.Reserva;
 
 import java.io.*;
 import java.text.Normalizer;
@@ -24,6 +25,14 @@ public class GestionCanchas {
         this.sc = new Scanner(System.in);
 
         cargarCanchasDesdeArchivo();
+    }
+
+    public List<Cancha> getListaCanchas() {
+        return listaCanchas;
+    }
+
+    public void setGestorReservas(GestionReservas gestorReservas) {
+        this.gestionReservas = gestorReservas;
     }
 
     public void mostrarMenuCanchas() {
@@ -106,7 +115,6 @@ public class GestionCanchas {
 
         Cancha nuevaCancha = new Cancha(nombre, deporte, cubierta, capacidad, estado, caracteristicas);
         listaCanchas.add(nuevaCancha);
-
         System.out.println("Cancha registrada con éxito!");
         System.out.println(nuevaCancha);
 
@@ -114,12 +122,11 @@ public class GestionCanchas {
     }
 
     public void listarCanchas(){
-        System.out.println("--- LISTA DE CANCHAS ---");
+        System.out.println("--LISTA DE CANCHAS--");
         if (listaCanchas.isEmpty()) {
             System.out.println("No hay canchas registradas.");
             return;
         }
-
         for (Cancha c : listaCanchas) {
             System.out.println(c);
             System.out.println("-----------------");
@@ -128,6 +135,7 @@ public class GestionCanchas {
 
     public void modificarCanchas() {
         System.out.println("--MODIFICAR CANCHAS--");
+
         System.out.println("Canchas disponibles:");
         for (Cancha c : listaCanchas) {
             System.out.println("ID: " + c.getIdCancha() + " - Nombre: " + c.getNombre());
@@ -147,6 +155,7 @@ public class GestionCanchas {
 
         if (canchaAModificar == null) {
             System.out.println("No hay cancha registrada con ese ID.");
+            return;
         }
 
         System.out.println("Cancha actual:");
@@ -158,26 +167,40 @@ public class GestionCanchas {
             canchaAModificar.setNombre(nuevoNombre);
         }
 
-        System.out.print("Nuevo deporte (enter para mantener): ");
-        String nuevoDeporte = sc.nextLine();
-        if (!nuevoDeporte.isBlank()){
-            canchaAModificar.setDeporte(nuevoDeporte);
+        boolean modificacionRestringida = canchaAModificar.getEstado().equalsIgnoreCase("Ocupada")
+                || canchaAModificar.getEstado().equalsIgnoreCase("Reservada");
+        if (modificacionRestringida) {
+            System.out.println("La cancha está reservada, no se puede modificar ese campo.");
         }
 
-        System.out.print("¿Es cubierta? (s/n, enter para mantener): ");
-        String cubiertaMod = sc.nextLine();
-        if (cubiertaMod.equalsIgnoreCase("s")){
-            canchaAModificar.setCubierta(true);
-        }else if (cubiertaMod.equalsIgnoreCase("n")){
-            canchaAModificar.setCubierta(false);
+        if (!modificacionRestringida) {
+            //Modificar campo de deporte
+            System.out.print("Nuevo deporte (enter para mantener): ");
+            String nuevoDeporte = sc.nextLine();
+            if (!nuevoDeporte.isBlank()) {
+                canchaAModificar.setDeporte(nuevoDeporte);
+            }
+
+            //Modificar campo de condición (cubierta o descubierta)
+            System.out.print("¿Es cubierta? (s/n, enter para mantener): ");
+            String cubiertaMod = sc.nextLine();
+            if(!cubiertaMod.isBlank()){
+                if (cubiertaMod.equalsIgnoreCase("s")) {
+                    canchaAModificar.setCubierta(true);
+                } else if (cubiertaMod.equalsIgnoreCase("n")) {
+                    canchaAModificar.setCubierta(false);
+                }
+            }
+
+            //Modificar campo de capacidad
+            System.out.print("Nueva capacidad (enter para mantener): ");
+            String capacidadStr = sc.nextLine();
+            if (!capacidadStr.isBlank()) {
+                canchaAModificar.setCapacidad(Integer.parseInt(capacidadStr));
+            }
         }
 
-        System.out.print("Nueva capacidad (enter para mantener): ");
-        String capacidadStr = sc.nextLine();
-        if (!capacidadStr.isBlank()){
-            canchaAModificar.setCapacidad(Integer.parseInt(capacidadStr));
-        }
-
+        //Modificar campo de características
         System.out.print("Nuevas características (separadas por coma, enter para mantener): ");
         String nuevasCaracteristicas = sc.nextLine();
         if (!nuevasCaracteristicas.isBlank()) {
@@ -196,16 +219,19 @@ public class GestionCanchas {
 
     public void eliminarCanchas() {
         System.out.println("--ELIMINAR CANCHAS--");
+
         if (listaCanchas.isEmpty()) {
             System.out.println("No hay canchas registradas.");
             return;
         }
 
+        //Mostrar las canchas disponibles
         System.out.println("Canchas disponibles:");
         for (Cancha c : listaCanchas) {
             System.out.println("ID: " + c.getIdCancha() + " - " + c.getNombre());
         }
 
+        //Seleccionar el id de la cancha que queremos eliminar
         System.out.print("Ingrese el ID de la cancha a eliminar: ");
         int idEliminar;
         try {
@@ -216,7 +242,6 @@ public class GestionCanchas {
             sc.nextLine();
             return;
         }
-
         Cancha canchaAEliminar = null;
         for (Cancha c : listaCanchas) {
             if (c.getIdCancha() == idEliminar) {
@@ -224,12 +249,12 @@ public class GestionCanchas {
                 break;
             }
         }
-
         if (canchaAEliminar == null) {
             System.out.println("No se encontró una cancha con ese ID.");
             return;
         }
 
+        //Confirmación para eliminar
         System.out.print("¿Está seguro que desea eliminar esta cancha? (s/n): ");
         String confirmacion = sc.nextLine();
         if (confirmacion.equalsIgnoreCase("s")) {
@@ -268,12 +293,20 @@ public class GestionCanchas {
                     canchasPorCondicion();
                     break;
                 case 0:
-                    System.out.println("Saliendo...");
+                    System.out.println("Volver al menú principal");
                     break;
                 default:
                     System.out.println("Intenta de nuevo");
             }
         }
+    }
+
+    //Método para que no tome en cuenta los tildes
+    private String normalizarTexto(String texto) {
+        return Normalizer.normalize(texto, Normalizer.Form.NFD)
+                .replaceAll("\\p{InCombiningDiacriticalMarks}+", "")
+                .toLowerCase()
+                .trim();
     }
 
     public void canchasPorDeporte() {
@@ -301,13 +334,6 @@ public class GestionCanchas {
         }
     }
 
-    private String normalizarTexto(String texto) {
-        return Normalizer.normalize(texto, Normalizer.Form.NFD)
-                .replaceAll("\\p{InCombiningDiacriticalMarks}+", "")
-                .toLowerCase()
-                .trim();
-    }
-
     public void canchasPorNombre() {
         System.out.println("-- CONSULTA POR NOMBRE --");
 
@@ -317,11 +343,12 @@ public class GestionCanchas {
         }
 
         System.out.print("Ingrese el nombre o parte del nombre a buscar: ");
-        String nombreBuscado = sc.nextLine().trim().toLowerCase();
+        String nombreBuscado = normalizarTexto(sc.nextLine().trim().toLowerCase());
 
         boolean encontrado = false;
         for (Cancha c : listaCanchas) {
-            if (c.getNombre().toLowerCase().contains(nombreBuscado)) {
+            String nombreCancha = normalizarTexto(c.getNombre());
+            if (nombreCancha.equals(nombreBuscado)) {
                 System.out.println(c);
                 encontrado = true;
             }
@@ -335,11 +362,11 @@ public class GestionCanchas {
     public void estadoDeCanchasPorFechaYHora() {
         System.out.println("-- ESTADO DE CANCHAS POR FECHA Y HORA --");
 
-        System.out.print("Ingrese la fecha (dd-MM-yyyy): ");
+        System.out.print("Ingrese la fecha (dd/mm/yyyy): ");
         String fechaStr = sc.nextLine();
         LocalDate fecha;
         try {
-            fecha = LocalDate.parse(fechaStr, DateTimeFormatter.ofPattern("dd-MM-yyyy"));
+            fecha = LocalDate.parse(fechaStr, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
         } catch (DateTimeParseException e) {
             System.out.println("Fecha inválida.");
             return;
@@ -355,20 +382,25 @@ public class GestionCanchas {
             return;
         }
 
-        System.out.println("Estado de canchas para " + fecha.format(DateTimeFormatter.ofPattern("dd-MM-yyyy")) + " a las " + hora);
-        System.out.println("--------------------------------------------------");
+        System.out.println("Estado de canchas para " + fecha.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")) + " a las " + hora);
+        System.out.println("------------------");
 
         for (Cancha cancha : listaCanchas) {
-            boolean reservada = gestionReservas.getListaReservas().stream().anyMatch(r -> {
+            boolean reservada = false;
+            for (Reserva r : gestionReservas.getListaReservas()) {
                 boolean mismaCancha = r.getCancha().getIdCancha() == cancha.getIdCancha();
                 boolean mismaFecha = r.getFecha_partido().equals(fecha);
 
                 LocalTime inicio = r.getHora_partido();
                 LocalTime fin = inicio.plusMinutes((long)(r.getDuracion_partido() * 60));
 
-                return mismaCancha && mismaFecha && !hora.isBefore(inicio) && !hora.isAfter(fin);
-            });
+                boolean dentroDelHorario = !hora.isBefore(inicio) && !hora.isAfter(fin);
 
+                if (mismaCancha && mismaFecha && dentroDelHorario) {
+                    reservada = true;
+                    break;
+                }
+            }
             String estado = reservada ? "Reservada" : "Disponible";
             System.out.println("Cancha: " + cancha.getNombre() + " | Deporte: " + cancha.getDeporte() + " | Estado: " + estado);
         }
@@ -398,8 +430,8 @@ public class GestionCanchas {
         boolean encontrado = false;
         for (Cancha c : listaCanchas) {
             if (c.isCubierta() == buscarCubiertas) {
-                System.out.println("----------------------------");
                 System.out.println(c);
+                System.out.println("------------------");
                 encontrado = true;
             }
         }
@@ -407,14 +439,6 @@ public class GestionCanchas {
         if (!encontrado) {
             System.out.println("No se encontraron canchas " + (buscarCubiertas ? "cubiertas." : "descubiertas."));
         }
-    }
-
-    public List<Cancha> getListaCanchas() {
-        return listaCanchas;
-    }
-
-    public void setGestorReservas(GestionReservas gestorReservas) {
-        this.gestionReservas = gestorReservas;
     }
 
     public void guardarCanchasEnArchivo() {

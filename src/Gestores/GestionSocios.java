@@ -1,17 +1,18 @@
 package Gestores;
 
+import Clases.Reserva;
 import Clases.Socio;
 
 import java.io.*;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Scanner;
 
 public class GestionSocios {
     private List<Socio> listaSocios = new ArrayList<>();
+    private GestionReservas gestionReservas;
     private Scanner sc;
 
     public GestionSocios() {
@@ -20,10 +21,14 @@ public class GestionSocios {
         cargarSociosDesdeArchivo();
     }
 
+    public List<Socio> getListaSocios() {
+        return listaSocios;
+    }
+
     public void mostrarMenuSocios(){
         int opcionSocios = -1;
         while (opcionSocios != 0) {
-            System.out.println("--- GESTIÓN DE SOCIOS ---");
+            System.out.println("--GESTIÓN DE SOCIOS--");
             System.out.println("1. Registrar socios");
             System.out.println("2. Listar socios");
             System.out.println("3. Modificar socios");
@@ -65,34 +70,41 @@ public class GestionSocios {
     public void registrarSocios() {
         System.out.println("--REGISTRAR SOCIOS--");
 
+        //Registro de nombre
         System.out.println("Nombre: ");
         String nombre = sc.nextLine();
 
+        //Registro de apellido paterno
         System.out.println("Apellido paterno: ");
         String apellido_paterno = sc.nextLine();
 
+        //Registro de apellido materno
         System.out.println("Apellido materno: ");
         String apellido_materno = sc.nextLine();
 
+        //Registro de cédula
         System.out.println("Cédula: ");
         int num_documento = sc.nextInt();
         sc.nextLine();
 
+        //Registro de fecha de nacimiento
         System.out.println("Fecha de nacimiento: (dd/MM/aaaa)");
         String fechaNacTexto = sc.nextLine();
         DateTimeFormatter f = DateTimeFormatter.ofPattern("dd/MM/yyyy");
         LocalDate fecha_nacimiento = LocalDate.parse(fechaNacTexto, f);
 
+        //Registro de teléfono
         System.out.println("Teléfono: ");
         int telefono = sc.nextInt();
         sc.nextLine();
 
+        //Registro de país de residencia
         System.out.println("País: ");
         String pais = sc.nextLine();
 
+        //Creo el nuevo socio, lo agrego a listaSocios y lo muestro
         Socio nuevoSocio = new Socio(nombre, apellido_paterno, apellido_materno, num_documento, fecha_nacimiento, telefono, pais);
         listaSocios.add(nuevoSocio);
-
         System.out.println("Socio registrado con éxito!");
         System.out.println(nuevoSocio);
 
@@ -114,11 +126,13 @@ public class GestionSocios {
     public void modificarSocios() {
         System.out.println("--MDIFICAR SOCIOS--");
 
+        //Muestro los socios registrados
         System.out.println("Socios disponibles:");
         for(Socio s : listaSocios) {
             System.out.println("Nombre: " + s.getNombre() + " - Apellidos: " + s.getApaterno() + " " + s.getAmaterno() + " - Cédula: " + s.getNum_documento());
         }
 
+        //Dada la lista de socios, ingreso la cédula del socio a modificar
         System.out.println("Ingrese la cédula del socio a modificar: ");
         int num_documentoModificar = sc.nextInt();
         sc.nextLine();
@@ -161,10 +175,9 @@ public class GestionSocios {
             socio.setNum_documento(Integer.parseInt(cedulaStr));
         }
 
-        System.out.print("¿Desea modificar la fecha de nacimiento? (s/n): ");
-        if (sc.nextLine().trim().equalsIgnoreCase("s")) {
-            System.out.print("Nueva fecha de nacimiento (dd/MM/yyyy): ");
-            String nuevaFechaNacimiento = sc.nextLine();
+        System.out.print("Nueva fecha de nacimiento (dd/mm/yyyy): (enter para mantener)");
+        String nuevaFechaNacimiento = sc.nextLine();
+        if (!nuevaFechaNacimiento.isBlank()) {
             try {
                 DateTimeFormatter f = DateTimeFormatter.ofPattern("dd/MM/yyyy");
                 socio.setFecha_nacimiento(LocalDate.parse(nuevaFechaNacimiento, f));
@@ -192,11 +205,13 @@ public class GestionSocios {
 
     public void eliminarSocios() {
         System.out.println("--ELIMINAR SOCIOS--");
+
         if(listaSocios.isEmpty()) {
             System.out.println("No hay socios registrados");
             return;
         }
 
+        //Mostrar lista de socios disponibles
         System.out.println("Socios disponibles:");
         for(Socio s : listaSocios) {
             System.out.println("Nombre: " + s.getNombre() + "Apellidos: " + s.getAmaterno() + " " + s.getApaterno() + " - Cédula: " + s.getNum_documento());
@@ -230,16 +245,22 @@ public class GestionSocios {
         String confirmacion = sc.nextLine();
         if (confirmacion.equalsIgnoreCase("s")) {
             listaSocios.remove(socioAEliminar);
+            // Eliminar reservas asociadas al socio eliminado
+            List<Reserva> reservasAEliminar = new ArrayList<>();
+            for (Reserva r : gestionReservas.getListaReservas()) {
+                if (r.getSocio().getNum_documento() == socioAEliminar.getNum_documento()) {
+                    reservasAEliminar.add(r);
+                }
+            }
+            gestionReservas.getListaReservas().removeAll(reservasAEliminar);
+            gestionReservas.guardarReservasEnArchivo();
+
             System.out.println("Socio eliminado con éxito!");
-        }else{
+        } else {
             System.out.println("Operación cancelada.");
         }
 
         guardarSociosEnArchivo();
-    }
-
-    public List<Socio> getListaSocios() {
-        return listaSocios;
     }
 
     public void guardarSociosEnArchivo() {

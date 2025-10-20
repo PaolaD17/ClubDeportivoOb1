@@ -1,6 +1,5 @@
 package Gestores;
 
-import Clases.Cancha;
 import Clases.Tarifa;
 
 import java.time.LocalDate;
@@ -16,14 +15,19 @@ public class GestionTarifas {
         cargarTarifasDesdeArchivo();
     }
 
+    public List<Tarifa> getListaTarifas() {
+        return listaTarifas;
+    }
+
     public void mostrarMenuTarifas() {
         int opcion = -1;
         while (opcion != 0) {
-            System.out.println("----- GESTIÓN DE TARIFAS -----");
-            System.out.println("1. Registrar nueva tarifa");
+            System.out.println("--GESTIÓN DE TARIFAS--");
+            System.out.println("1. Registrar tarifa");
             System.out.println("2. Listar tarifas");
             System.out.println("3. Buscar tarifa vigente por deporte");
             System.out.println("0. Volver");
+
             System.out.print("Seleccione una opción: ");
             opcion = Integer.parseInt(sc.nextLine());
 
@@ -47,12 +51,15 @@ public class GestionTarifas {
     }
 
     public void registrarTarifa() {
+        //Registrar nombre del deporte de dicha tarifa
         System.out.print("Deporte: ");
         String deporte = sc.nextLine().trim().toLowerCase();
 
+        //Registrar monto de la tarifa
         System.out.print("Monto: ");
         double monto = Double.parseDouble(sc.nextLine());
 
+        //Registrar fecha de entrada en viencia de la tarifa
         System.out.print("Fecha de vigencia (dd/mm/yyyy): ");
         String fechaTexto = sc.nextLine();
         DateTimeFormatter f = DateTimeFormatter.ofPattern("dd/MM/yyyy");
@@ -78,10 +85,18 @@ public class GestionTarifas {
     }
 
     public Tarifa obtenerTarifaVigente(String deporte, LocalDate fechaPartido) {
-        return listaTarifas.stream()
-                .filter(t -> t.getDeporte().equalsIgnoreCase(deporte) && !t.getFechaVigencia().isAfter(fechaPartido))
-                .max(Comparator.comparing(Tarifa::getFechaVigencia))
-                .orElse(null);
+        Tarifa tarifaVigente = null;
+        for (Tarifa t : listaTarifas) {
+            boolean mismoDeporte = t.getDeporte().equalsIgnoreCase(deporte);
+            boolean fechaValida = !t.getFechaVigencia().isAfter(fechaPartido);
+
+            if (mismoDeporte && fechaValida) {
+                if (tarifaVigente == null || t.getFechaVigencia().isAfter(tarifaVigente.getFechaVigencia())) {
+                    tarifaVigente = t;
+                }
+            }
+        }
+        return tarifaVigente;
     }
 
     public void buscarTarifaPorDeporte() {
@@ -126,9 +141,5 @@ public class GestionTarifas {
         } catch (IOException e) {
             System.out.println("Error al cargar tarifas: " + e.getMessage());
         }
-    }
-
-    public List<Tarifa> getListaTarifas() {
-        return listaTarifas;
     }
 }
